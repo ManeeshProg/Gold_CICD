@@ -1,6 +1,6 @@
 # Environment variables (keep .env.example for reference)
 .env
-
+.env.example
 rub.py
 # Python cache
 __pycache__/
