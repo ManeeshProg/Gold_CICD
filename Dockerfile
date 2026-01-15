@@ -1,4 +1,4 @@
-FROM python:3.11-bookworm
+FROM python:3.10-slim
 
 WORKDIR /app
 
@@ -10,13 +10,10 @@ RUN apt-get update && apt-get install -y \
     libxext6 \
     libxrender1 \
     libgomp1 \
-    libstdc++6 \
     build-essential \
     cmake \
     git \
     curl \
-    wget \
-    execstack \
     && rm -rf /var/lib/apt/lists/*
 
 # Create config directory for Ultralytics
@@ -24,19 +21,13 @@ RUN mkdir -p /root/.config/Ultralytics
 
 COPY requirements.txt .
 
-# Install Python dependencies in correct order
+# Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Install numpy first
-RUN pip install --no-cache-dir numpy==1.26.3
+# Install onnxruntime (version 1.15.1 works well with Python 3.10)
+RUN pip install --no-cache-dir onnxruntime==1.15.1
 
-# Install onnxruntime (newer version that fixes execstack issue)
-RUN pip install --no-cache-dir onnxruntime==1.17.0
-
-# Fix execstack issue for onnxruntime
-RUN execstack -c /usr/local/lib/python3.11/site-packages/onnxruntime/capi/*.so || true
-
-# Verify onnxruntime installed correctly
+# Verify onnxruntime works
 RUN python -c "import onnxruntime; print('ONNX Runtime version:', onnxruntime.__version__)"
 
 # Install remaining dependencies
