@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv
+venv/
+ENV/
+.eggs
+*.egg-info/
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# CI/CD
+.github/
+
+# Documentation
+*.md
+docs/
+
+# Testing
+tests/
+htmlcov/
+.coverage
+
+# Temporary
+*.log
+*.tmp
+uploads/
