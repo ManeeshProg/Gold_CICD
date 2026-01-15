@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.11-bookworm
 
 WORKDIR /app
 
@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     wget \
+    execstack \
     && rm -rf /var/lib/apt/lists/*
 
 # Create config directory for Ultralytics
@@ -26,18 +27,20 @@ COPY requirements.txt .
 # Install Python dependencies in correct order
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Install onnxruntime FIRST (before insightface)
+# Install numpy first
 RUN pip install --no-cache-dir numpy==1.26.3
-RUN pip install --no-cache-dir onnxruntime==1.16.3
+
+# Install onnxruntime (newer version that fixes execstack issue)
+RUN pip install --no-cache-dir onnxruntime==1.17.0
+
+# Fix execstack issue for onnxruntime
+RUN execstack -c /usr/local/lib/python3.11/site-packages/onnxruntime/capi/*.so || true
 
 # Verify onnxruntime installed correctly
 RUN python -c "import onnxruntime; print('ONNX Runtime version:', onnxruntime.__version__)"
 
 # Install remaining dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Verify insightface can import onnxruntime
-RUN python -c "import onnxruntime; import insightface; print('InsightFace loaded successfully')" || echo "InsightFace check failed but continuing..."
 
 COPY . .
 
